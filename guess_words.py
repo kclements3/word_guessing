@@ -2,6 +2,25 @@
 # Output: chain of words guessed until the right one is found
 import regex
 
+def regex_drop(word, word_regex):
+    regex_str = ''.join(word_regex)
+    match = regex.match(regex_str, word)
+    if match is None:
+        return False
+    else:
+        return True
+
+def eliminate_by_letter_exclusion(word, letters):
+    for excluded in letters:
+        if excluded in word:
+            return False
+    return True
+
+def eliminate_by_letter_inclusion(word, letters):
+    for included in letters:
+        if included not in word:
+            return False
+    return True
 
 class WordGuess:
     def __init__(self, first_guess, final_word, word_data):
@@ -38,32 +57,49 @@ class WordGuess:
                     self.not_in_word.append(self.guess[f])
         word_data_update = self.remaining_word_data
 
-        for row in self.remaining_word_data.iterrows():
-            if row[1]['word'] == self.guess:
-                word_data_update = word_data_update.drop(row[0])
-                continue
-            dropped = False
-            # Remove word if it contains ruled out letters
-            for excluded in self.not_in_word:
-                if excluded in row[1]['word']:
-                    word_data_update = word_data_update.drop(row[0])
-                    dropped = True
-                    break
-            if not dropped:
-                # Remove word if it doesn't have yellow letters
-                for included in self.in_word:
-                    if included not in row[1]['word']:
-                        word_data_update = word_data_update.drop(row[0])
-                        dropped = True
-                        break
-            if not dropped:
-                # Check if word fits regex
-                regex_str = ''.join(self.word_regex)
-                match = regex.match(regex_str, row[1]['word'])
-                if match is None:
-                    word_data_update = word_data_update.drop(row[0])
+        # Drop current guess
+        guess_drop_ind = self.remaining_word_data['word'].index[self.remaining_word_data['word'] == self.guess]
+        self.remaining_word_data = self.remaining_word_data.drop(guess_drop_ind)
 
-        self.remaining_word_data = word_data_update
+        # Eliminate by excluded letters
+        eliminate_inds = self.remaining_word_data['word'].apply(lambda x: eliminate_by_letter_exclusion(x, self.not_in_word))
+        self.remaining_word_data = self.remaining_word_data[eliminate_inds]
+
+        # Eliminate by letters that must be in word
+        eliminate_inds = self.remaining_word_data['word'].apply(lambda x: eliminate_by_letter_inclusion(x, self.in_word))
+        self.remaining_word_data = self.remaining_word_data[eliminate_inds]
+
+        # Apply regex
+        regex_check = self.remaining_word_data['word'].apply(lambda x: regex_drop(x, self.word_regex))
+        self.remaining_word_data = self.remaining_word_data[regex_check]
+
+
+        # for row in self.remaining_word_data.iterrows():
+        #     if row[1]['word'] == self.guess:
+        #         word_data_update = word_data_update.drop(row[0])
+        #         continue
+        #     dropped = False
+        #     # Remove word if it contains ruled out letters
+        #     for excluded in self.not_in_word:
+        #         if excluded in row[1]['word']:
+        #             word_data_update = word_data_update.drop(row[0])
+        #             dropped = True
+        #             break
+        #     if not dropped:
+        #         # Remove word if it doesn't have yellow letters
+        #         for included in self.in_word:
+        #             if included not in row[1]['word']:
+        #                 word_data_update = word_data_update.drop(row[0])
+        #                 dropped = True
+        #                 break
+        #     if not dropped:
+        #         # Check if word fits regex
+        #         regex_str = ''.join(self.word_regex)
+        #         match = regex.match(regex_str, row[1]['word'])
+        #         if match is None:
+        #             word_data_update = word_data_update.drop(row[0])
+        #
+        # self.remaining_word_data = word_data_update
         if self.feedback.count('k') < 4:
             self.remaining_word_data = self.remaining_word_data.sort_values(by='count', ascending=False)
 

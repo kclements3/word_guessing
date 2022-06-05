@@ -2,6 +2,7 @@ import pandas as pd
 global in_word
 global not_in_word
 from guess_words import *
+import cProfile
 
 
 def print_hi(name):
@@ -28,7 +29,8 @@ def solve(initial_guess, final_word, print_steps):
     return guess_count
 
 # Press the green button in the gutter to run the script.
-if __name__ == '__main__':
+def main():
+    global flw_data
     flw_data = pd.read_csv('out_with_wordfreqs.csv')
     mode = 'test'  # can be 'test', 'live guess', or 'evaluate'
 
@@ -46,7 +48,10 @@ if __name__ == '__main__':
             feedback = input('What was the feedback?')
             word_guess_obj.feedback = list(feedback)
             word_guess_obj.process_feedback()
-            print('Suggest guessing:', word_guess_obj.guess)
+            # print('Suggest guessing:', word_guess_obj.guess)
+            print('Suggest Guessing:')
+            for i in range(min(3, len(word_guess_obj.remaining_word_data))):
+                print(word_guess_obj.remaining_word_data['word'].iloc[i])
             word_guess_obj.guess = input('What is your actual guess?')
             correct = input('Was it right?')
             if correct[0] == 'y':
@@ -55,9 +60,10 @@ if __name__ == '__main__':
 
 
     elif mode == 'evaluate':
-        f = open('wordle_past_compare.csv', 'r')
+        f = open('wordle_past.csv', 'r')
         wordles = f.readlines()
         wordles = [wordle.rstrip('\n').lower() for wordle in wordles]
+        wordles = [wordle.lstrip().lower() for wordle in wordles]
         wordles[0] = wordles[0].lstrip('\ufeff')
         f.close()
 
@@ -83,4 +89,27 @@ if __name__ == '__main__':
         wordle_guesses_out = pd.DataFrame.from_dict(out_dict)
         wordle_guesses_out.to_csv('wordle_guess_counts_compare_keith.csv')
 
+    # cProfile.run("main()")
 
+if __name__ == '__main__':
+    import cProfile, pstats
+    from io import StringIO
+    profiler = cProfile.Profile()
+    profiler.enable()
+    main()
+    profiler.disable()
+
+    profiler.dump_stats('output.prof')
+
+    stream = open('output.txt', 'w')
+    stats = pstats.Stats('output.prof', stream=stream)
+    stats.sort_stats('cumtime')
+    stats.print_stats()
+
+    # profiler.dump_stats('program_stats.txt')
+    # sortby = 'ncalls'
+    # ps = pstats.Stats(profiler).sort_stats(sortby)
+    #
+    # ps.dump_stats('stats.dmp')
+    # stats = pstats.Stats(profiler).sort_stats('ncalls')
+    # stats.print_stats()
