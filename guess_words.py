@@ -60,18 +60,26 @@ class WordGuess:
         # Drop current guess
         guess_drop_ind = self.remaining_word_data['word'].index[self.remaining_word_data['word'] == self.guess]
         self.remaining_word_data = self.remaining_word_data.drop(guess_drop_ind)
+        if len(self.remaining_word_data) == 0:
+            return
 
         # Eliminate by excluded letters
         eliminate_inds = self.remaining_word_data['word'].apply(lambda x: eliminate_by_letter_exclusion(x, self.not_in_word))
         self.remaining_word_data = self.remaining_word_data[eliminate_inds]
+        if len(self.remaining_word_data) == 0:
+            return
 
         # Eliminate by letters that must be in word
         eliminate_inds = self.remaining_word_data['word'].apply(lambda x: eliminate_by_letter_inclusion(x, self.in_word))
         self.remaining_word_data = self.remaining_word_data[eliminate_inds]
+        if len(self.remaining_word_data) == 0:
+            return
 
         # Apply regex
         regex_check = self.remaining_word_data['word'].apply(lambda x: regex_drop(x, self.word_regex))
         self.remaining_word_data = self.remaining_word_data[regex_check]
+        if len(self.remaining_word_data) == 0:
+            return
 
 
         # for row in self.remaining_word_data.iterrows():
@@ -101,7 +109,8 @@ class WordGuess:
         #
         # self.remaining_word_data = word_data_update
         if self.feedback.count('k') < 4:
-            self.remaining_word_data = self.remaining_word_data.sort_values(by='count', ascending=False)
+            if len(self.remaining_word_data) > 0:
+                self.remaining_word_data = self.remaining_word_data.sort_values(by='count', ascending=False)
 
         # update guess to be first remaining word
         self.guess = self.remaining_word_data['word'].iloc[0]
