@@ -1,8 +1,5 @@
 import pandas as pd
-global in_word
-global not_in_word
 from guess_words import *
-import cProfile
 
 
 def print_hi(name):
@@ -50,7 +47,7 @@ def main():
             word_guess_obj.process_feedback()
             # print('Suggest guessing:', word_guess_obj.guess)
             print('Suggest Guessing:')
-            for i in range(min(3, len(word_guess_obj.remaining_word_data))):
+            for i in range(min(5, len(word_guess_obj.remaining_word_data))):
                 print(word_guess_obj.remaining_word_data['word'].iloc[i])
             word_guess_obj.guess = input('What is your actual guess?')
             correct = input('Was it right?')
@@ -93,7 +90,6 @@ def main():
 
 if __name__ == '__main__':
     import cProfile, pstats
-    from io import StringIO
     profiler = cProfile.Profile()
     profiler.enable()
     main()
@@ -105,11 +101,3 @@ if __name__ == '__main__':
     stats = pstats.Stats('output.prof', stream=stream)
     stats.sort_stats('cumtime')
     stats.print_stats()
-
-    # profiler.dump_stats('program_stats.txt')
-    # sortby = 'ncalls'
-    # ps = pstats.Stats(profiler).sort_stats(sortby)
-    #
-    # ps.dump_stats('stats.dmp')
-    # stats = pstats.Stats(profiler).sort_stats('ncalls')
-    # stats.print_stats()

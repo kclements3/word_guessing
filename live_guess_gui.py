@@ -144,6 +144,8 @@ def create_entry_panel(root):
 
     return frame
 
+# class WordleGuess:
+#     def __init__(self, flw_data):
 
 if __name__ == '__main__':
     grid = []

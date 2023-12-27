@@ -55,7 +55,7 @@ class WordGuess:
             elif self.feedback[f] == 'k':
                 if self.guess[f] not in self.in_word:
                     self.not_in_word.append(self.guess[f])
-        word_data_update = self.remaining_word_data
+        # word_data_update = self.remaining_word_data
 
         # Drop current guess
         guess_drop_ind = self.remaining_word_data['word'].index[self.remaining_word_data['word'] == self.guess]
@@ -81,58 +81,10 @@ class WordGuess:
         if len(self.remaining_word_data) == 0:
             return
 
-
-        # for row in self.remaining_word_data.iterrows():
-        #     if row[1]['word'] == self.guess:
-        #         word_data_update = word_data_update.drop(row[0])
-        #         continue
-        #     dropped = False
-        #     # Remove word if it contains ruled out letters
-        #     for excluded in self.not_in_word:
-        #         if excluded in row[1]['word']:
-        #             word_data_update = word_data_update.drop(row[0])
-        #             dropped = True
-        #             break
-        #     if not dropped:
-        #         # Remove word if it doesn't have yellow letters
-        #         for included in self.in_word:
-        #             if included not in row[1]['word']:
-        #                 word_data_update = word_data_update.drop(row[0])
-        #                 dropped = True
-        #                 break
-        #     if not dropped:
-        #         # Check if word fits regex
-        #         regex_str = ''.join(self.word_regex)
-        #         match = regex.match(regex_str, row[1]['word'])
-        #         if match is None:
-        #             word_data_update = word_data_update.drop(row[0])
-        #
-        # self.remaining_word_data = word_data_update
+        # Change sorting method if more than 2 letters have been ID'd in word
         if self.feedback.count('k') < 4:
             if len(self.remaining_word_data) > 0:
                 self.remaining_word_data = self.remaining_word_data.sort_values(by='count', ascending=False)
 
         # update guess to be first remaining word
         self.guess = self.remaining_word_data['word'].iloc[0]
-
-
-
-# def check_guess(guess: str, final_word: str):
-#     feedback = []
-#     for i in range(5):
-#         if guess[i] == final_word[i]:
-#             feedback.append('g')
-#         elif guess[i] in final_word:
-#             feedback.append('y')
-#         else:
-#             feedback.append('b')
-#
-#     return feedback
-#
-# def process_feedback(feedback, guess):
-#     # Take in feedback and eliminate words to produce new guess
-#     guess_regex = [r'\w']*5
-#     for f in range(len(feedback)):
-#         if feedback[f] == 'g'
-#             guess_regex[f] = guess[f]
-#         elif
