@@ -24,13 +24,13 @@ def eliminate_by_letter_inclusion(word, letters):
 
 class WordGuess:
     def __init__(self, first_guess, final_word, word_data):
-        self.guess = first_guess
-        self.final = final_word
-        self.feedback = ['k']*5
-        self.word_regex = [r'\w']*5
-        self.not_in_word = []
-        self.in_word = []
-        self.remaining_word_data = word_data
+        self.guess = first_guess # This will update as more guesses are used
+        self.final = final_word # Not relevant for the GUI, just for testing lots of words
+        self.feedback = ['k']*5 # initial feedback is all gray (black)
+        self.word_regex = [r'\w']*5 # initial regex pattern is just "any word characters"
+        self.not_in_word = [] # List of letters not in word
+        self.in_word = [] # List of letters in the word
+        self.remaining_word_data = word_data # giant pandas dataframe of all remaining words and scores
 
     def check_guess(self):
         for i in range(5):

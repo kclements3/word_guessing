@@ -4,10 +4,10 @@ from guess_words import *
 import pandas as pd
 
 
-def create_wordle_gui():
-    root = Tk()
-
-    frame = ttk.Frame(root)
+# def create_wordle_gui():
+#     root = Tk()
+#
+#     frame = ttk.Frame(root)
 
 def cycle_colors(event):
     cur_color = event.widget.cget('bg')
@@ -19,6 +19,7 @@ def cycle_colors(event):
         event.widget.config(background='gray')
 
 def process_feedback():
+    # Reset the feedback button state
     feedback_btn['state'] = DISABLED
     global cur_row
 
@@ -53,13 +54,6 @@ def process_feedback():
         else:
             lb.insert(0, 'No Remaining words... ')
             lb.insert(1, 'Either the word is obscure or something is wrong')
-
-# def create_suggestions(frame):
-#     suggestions = word_guess_obj.remaining_word_data['word'].iloc[0:3]
-#     lb = Listbox(frame, width=10)
-#     lb.grid(row=1, column=0, columnspan=2)
-#     for s in range(3):
-#         lb.insert(s, suggestions[s])
 
     # return lb
 def use_selected_word():
@@ -112,6 +106,7 @@ def press_tab(event):
             feedback_btn['state'] = NORMAL
     elif event.keysym == 'BackSpace':
         press_delete(event)
+        feedback_btn['state'] = DISABLED
 
 def press_delete(event):
     row = event.widget.grid_info()['row']
@@ -125,6 +120,7 @@ def press_delete(event):
 def create_entry_panel(root):
     frame = ttk.Frame(root)
 
+    # Create the grid for the board
     for row in range(6):
         grid.append([])
         for col in range(5):
@@ -151,7 +147,10 @@ if __name__ == '__main__':
     grid = []
 
     cur_row = 0
+    # Read in all the five letter word data from the pre-processed CSV
     flw_data = pd.read_csv('out_with_wordfreqs.csv')
+
+    # Create instance of the "WordGuess" class from guess_words.py
     word_guess_obj = WordGuess('', '', flw_data)
 
 
